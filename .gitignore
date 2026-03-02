@@ -1,0 +1,24 @@
+# ---- Frontend ----
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+*.local
+
+# ---- Backend ----
+.gradle/
+build/
+*.jar
+*.war
+.kotlin/
+local.properties
+
+# ---- IDE ----
+.idea/
+*.iml
+.vscode/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db

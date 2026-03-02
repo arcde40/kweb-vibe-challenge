@@ -1,0 +1,10 @@
+ktor:
+  application:
+    modules:
+      - org.kweb.ApplicationKt.module
+  deployment:
+    port: 8080
+mariadb:
+  url: "jdbc:mariadb://192.168.0.201:3306/vibe_challenge"
+  user: kweb
+  password: ${DB_PASSWORD}
