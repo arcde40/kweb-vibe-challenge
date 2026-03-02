@@ -41,14 +41,20 @@ export function SandboxCanvas({
 
       <div className="relative flex-1 bg-white dark:bg-zinc-950 overflow-hidden">
         {/* Streaming overlay — always mounted, fades in/out */}
-        <div className={`absolute inset-0 bg-black/75 overflow-hidden z-20 flex flex-col justify-end backdrop-blur-md transition-opacity duration-500 ${isStreaming ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-          {/* Centered Title */}
+        <div className={`absolute inset-0 bg-black/75 overflow-hidden z-20 flex flex-col justify-end backdrop-blur-md transition-opacity duration-500 ${isStreaming || !code ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+          {/* Centered icon */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
-            <div className="text-center">
-              <Sparkles className="w-16 h-16 text-primary mx-auto mb-6 animate-pulse drop-shadow-[0_0_15px_rgba(79,70,229,0.5)]" />
-              <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50 drop-shadow-2xl">
-                {t("canvas.loading.title")}
-              </h2>
+            <div className="flex flex-col items-center gap-6">
+              <div className="relative flex items-center justify-center">
+                <div className="absolute w-32 h-32 rounded-full bg-primary/10 animate-ping" style={{ animationDuration: "1.8s" }} />
+                <div className="absolute w-20 h-20 rounded-full bg-primary/15 animate-pulse" />
+                <Sparkles className="relative w-10 h-10 text-primary drop-shadow-[0_0_20px_rgba(99,102,241,0.9)]" />
+              </div>
+              <div className="flex gap-1.5">
+                {[0, 150, 300].map((delay) => (
+                  <span key={delay} className="w-1.5 h-1.5 rounded-full bg-white/50 animate-bounce" style={{ animationDelay: `${delay}ms` }} />
+                ))}
+              </div>
             </div>
           </div>
 
