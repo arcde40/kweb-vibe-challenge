@@ -1,4 +1,6 @@
-import { Target } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { Target, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Markdown from "react-markdown";
 import { PromptInput } from "../components/PromptInput";
@@ -12,6 +14,14 @@ interface InputPageProps {
 
 export function InputPage({ constraints, onSubmit, isLoading }: InputPageProps) {
   const { t } = useTranslation();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setLightboxOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxOpen]);
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center p-6 animate-in fade-in slide-in-from-bottom-10 duration-500">
@@ -37,17 +47,44 @@ export function InputPage({ constraints, onSubmit, isLoading }: InputPageProps) 
             </div>
 
             {constraints.imageUrl && (
-              <div className="relative z-10 w-full md:w-1/3 aspect-video md:aspect-square rounded-2xl overflow-hidden border-2 border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] shrink-0">
-                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-transparent mix-blend-overlay z-10"></div>
-                <img
-                  src={constraints.imageUrl}
-                  alt="Reference UI"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute bottom-2 right-2 z-20 bg-black/60 backdrop-blur-md px-2 py-1 flex items-center gap-1 rounded text-[10px] font-bold text-white/70 uppercase tracking-widest border border-white/10">
-                  {t("challenge.reference")}
+              <>
+                <div
+                  onClick={() => setLightboxOpen(true)}
+                  className="group relative z-10 w-full md:w-1/3 aspect-video md:aspect-square rounded-2xl overflow-hidden border-2 border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] shrink-0 cursor-zoom-in"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-transparent mix-blend-overlay z-10"></div>
+                  <img
+                    src={constraints.imageUrl}
+                    alt="Reference UI"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute bottom-2 right-2 z-20 bg-black/60 backdrop-blur-md px-2 py-1 flex items-center gap-1 rounded text-[10px] font-bold text-white/70 uppercase tracking-widest border border-white/10">
+                    {t("challenge.reference")}
+                  </div>
                 </div>
-              </div>
+
+                {/* Lightbox — portalled to body to escape stacking context */}
+                {createPortal(
+                  <div
+                    onClick={() => setLightboxOpen(false)}
+                    className={`fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md transition-opacity duration-300 ${lightboxOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                  >
+                    <button
+                      onClick={() => setLightboxOpen(false)}
+                      className="absolute top-5 right-5 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                    >
+                      <X className="w-6 h-6" />
+                    </button>
+                    <img
+                      src={constraints.imageUrl}
+                      alt="Reference UI"
+                      onClick={(e) => e.stopPropagation()}
+                      className={`max-w-[90vw] max-h-[90vh] rounded-2xl shadow-2xl object-contain transition-transform duration-300 ${lightboxOpen ? "scale-100" : "scale-90"}`}
+                    />
+                  </div>,
+                  document.body
+                )}
+              </>
             )}
           </div>
         )}

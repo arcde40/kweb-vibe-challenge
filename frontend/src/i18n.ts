@@ -1,79 +1,79 @@
 import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
+import {initReactI18next} from "react-i18next";
 
 const resources = {
-  en: {
-    translation: {
-      "app.title.code": "KWEB",
-      "app.title.vibe": "Vibe Coding Challenge",
-      "app.subtitle":
-        "Are you ready for the vibe challenge? Click below to receive your random objective and constraints.",
-      "app.action.pick": "Pick a Challenge",
-      "app.action.fetching": "Fetching Challenge...",
-      "app.action.new": "New Challenge",
-      "app.action.finish": "Finish Challenge",
-      "challenge.target_objective": "Target Objective",
-      "challenge.reference": "Reference",
-      "prompt.title": "Vibe Prompt",
-      "prompt.placeholder":
-        "Describe the website you want to build...",
-      "prompt.press": "Press",
-      "prompt.to_generate": "to generate",
-      "prompt.generating": "Generating...",
-      "prompt.submit": "Code it!",
-      "constraint.letters": "{{count}} letters or less",
-      "constraint.letters_current":
-        "{{max}} letters or less (current: {{current}})",
-      "constraint.korean_only": "Korean & punctuation only",
-      "constraint.forbidden": "No forbidden words ({{words}})",
-      "constraint.required": "Must include: {{words}}",
-      "canvas.loading.title": "Vibing the Code...",
-      "canvas.loading.subtitle":
-        "Our AI is writing HTML, CSS, and JS to bring your prompt to life.",
-      "canvas.waiting": "Waiting for prompt...",
-      "canvas.title": "Live Output Canvas",
+    en: {
+        translation: {
+            "app.title.code": "KWEB",
+            "app.title.vibe": "Vibe Coding Challenge",
+            "app.subtitle":
+                "Are you ready for the vibe challenge? Click below to receive your random objective and constraints.",
+            "app.action.pick": "Pick a Challenge",
+            "app.action.fetching": "Fetching Challenge...",
+            "app.action.new": "New Challenge",
+            "app.action.finish": "Finish Challenge",
+            "challenge.target_objective": "Target Objective",
+            "challenge.reference": "Reference",
+            "prompt.title": "Vibe Prompt",
+            "prompt.placeholder":
+                "Describe the website you want to build...",
+            "prompt.press": "Press",
+            "prompt.to_generate": "to generate",
+            "prompt.generating": "Generating...",
+            "prompt.submit": "Code it!",
+            "constraint.letters": "{{count}} letters or less",
+            "constraint.letters_current":
+                "{{max}} letters or less (current: {{current}})",
+            "constraint.korean_only": "Korean & punctuation only",
+            "constraint.forbidden": "No forbidden words ({{words}})",
+            "constraint.required": "Must include: {{words}}",
+            "canvas.loading.title": "Vibing the Code...",
+            "canvas.loading.subtitle":
+                "Our AI is writing HTML, CSS, and JS to bring your prompt to life.",
+            "canvas.waiting": "Waiting for prompt...",
+            "canvas.title": "Live Output Canvas",
+        },
     },
-  },
-  ko: {
-    translation: {
-      "app.title.code": "KWEB",
-      "app.title.vibe": "Vibe Coding Challenge",
-      "app.subtitle":
-        "Vibe Coding 챌린지에 참여할 준비가 되셨나요?\n아래 버튼을 눌러 랜덤 목표와 조건을 확인하세요.",
-      "app.action.pick": "챌린지 뽑기",
-      "app.action.fetching": "챌린지 불러오는 중...",
-      "app.action.new": "새로운 챌린지",
-      "app.action.finish": "챌린지 종료하기",
-      "challenge.target_objective": "목표",
-      "challenge.reference": "레퍼런스 이미지",
-      "prompt.title": "프롬프트",
-      "prompt.placeholder":
-        "어떤 웹사이트를 만들고 싶으신가요? (예: '글래스모피즘이 적용된 예쁜 계산기')",
-      "prompt.press": "",
-      "prompt.to_generate": "키를 눌러 생성하기",
-      "prompt.generating": "생성 중...",
-      "prompt.submit": "코딩하기!",
-      "constraint.letters": "{{count}}자 이하",
-      "constraint.letters_current": "{{max}}자 이하 (현재: {{current}}자)",
-      "constraint.korean_only": "한글 및 기호만 사용",
-      "constraint.forbidden": "금지어 없음 ({{words}})",
-      "constraint.required": "필수 단어: {{words}}",
-      "canvas.loading.title": "코드를 생성하는 중...",
-      "canvas.loading.subtitle":
-        "AI가 프롬프트를 바탕으로 코드를 작성하고 있습니다.",
-      "canvas.waiting": "프롬프트 대기 중...",
-      "canvas.title": "라이브 출력 캔버스",
+    ko: {
+        translation: {
+            "app.title.code": "KWEB",
+            "app.title.vibe": "Vibe Coding Challenge",
+            "app.subtitle":
+                "Vibe Coding 챌린지에 참여할 준비가 되셨나요?\n아래 버튼을 눌러 랜덤 목표와 조건을 확인하세요.",
+            "app.action.pick": "챌린지 뽑기",
+            "app.action.fetching": "챌린지 불러오는 중...",
+            "app.action.new": "새로운 챌린지",
+            "app.action.finish": "챌린지 종료하기",
+            "challenge.target_objective": "목표",
+            "challenge.reference": "레퍼런스 이미지 (클릭 시 확대)",
+            "prompt.title": "프롬프트",
+            "prompt.placeholder":
+                "어떤 웹사이트를 만들고 싶으신가요? (예: '글래스모피즘이 적용된 예쁜 계산기')",
+            "prompt.press": "",
+            "prompt.to_generate": "키를 눌러 생성하기",
+            "prompt.generating": "생성 중...",
+            "prompt.submit": "코딩하기!",
+            "constraint.letters": "{{count}}자 이하",
+            "constraint.letters_current": "{{max}}자 이하 (현재: {{current}}자)",
+            "constraint.korean_only": "한글 및 기호만 사용",
+            "constraint.forbidden": "금지어 없음 ({{words}})",
+            "constraint.required": "필수 단어: {{words}}",
+            "canvas.loading.title": "코드를 생성하는 중...",
+            "canvas.loading.subtitle":
+                "AI가 프롬프트를 바탕으로 코드를 작성하고 있습니다.",
+            "canvas.waiting": "프롬프트 대기 중...",
+            "canvas.title": "라이브 출력 캔버스",
+        },
     },
-  },
 };
 
 i18n.use(initReactI18next).init({
-  resources,
-  lng: "ko", // default language
-  fallbackLng: "ko",
-  interpolation: {
-    escapeValue: false,
-  },
+    resources,
+    lng: "ko", // default language
+    fallbackLng: "ko",
+    interpolation: {
+        escapeValue: false,
+    },
 });
 
 export default i18n;
