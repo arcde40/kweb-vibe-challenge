@@ -7,6 +7,8 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.kweb.api.ai.AIResultTable
 import org.kweb.api.challenge.ChallengeTable
 import org.kweb.api.constraint.ConstraintTable
+import org.kweb.api.criteria.ChallengeCriteriaTable
+import org.kweb.api.criteria.CriteriaTable
 import java.sql.DriverManager
 
 fun Application.configureDatabases() {
@@ -28,7 +30,7 @@ fun Application.connectToMaria(embedded: Boolean) {
         Database.connect(url, driver = DB_DRIVER_NAME, user = user, password = password)
 
         transaction {
-            SchemaUtils.create(ConstraintTable, ChallengeTable, AIResultTable)
+            SchemaUtils.create(ConstraintTable, ChallengeTable, AIResultTable, CriteriaTable, ChallengeCriteriaTable)
         }
     }
 }

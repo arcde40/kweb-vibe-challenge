@@ -1,7 +1,7 @@
 package org.kweb.api.challenge.model
 
-import org.h2.constraint.Constraint
 import org.kweb.api.constraint.model.ConstraintDto
+import org.kweb.api.criteria.model.CriteriaDto
 
 data class ChallengeDto(
     val id: Int,
@@ -9,4 +9,5 @@ data class ChallengeDto(
     val description: String,
     val imageUrl: String? = null,
     val constraint: ConstraintDto,
+    val criteria: List<CriteriaDto> = emptyList(),
 )

@@ -86,6 +86,7 @@ function App() {
             code={generatedCode}
             isStreaming={isStreaming}
             onFinish={() => setStep("start")}
+            challenge={constraints}
           />
         )}
       </main>

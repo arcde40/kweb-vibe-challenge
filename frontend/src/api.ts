@@ -5,12 +5,18 @@ export interface ChallengeConstraints {
     includedWords: string[];
 }
 
+export interface Criteria {
+    id: number;
+    description: string;
+}
+
 export interface Challenge {
     id: number;
     title: string;
     description: string;
     imageUrl: string;
     constraint: ChallengeConstraints;
+    criteria: Criteria[];
 }
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
@@ -36,6 +42,7 @@ export const fetchChallenge = async (): Promise<Challenge> => {
                 excludedLetters: ["가"],
                 includedWords: ["테스트"],
             },
+            criteria: [],
         };
     }
 };

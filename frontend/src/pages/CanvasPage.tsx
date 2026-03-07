@@ -1,13 +1,16 @@
 import { useTranslation } from "react-i18next";
 import { SandboxCanvas } from "../components/SandboxCanvas";
+import { ReviewPanel } from "../components/ReviewPanel";
+import type { Challenge } from "../api";
 
 interface CanvasPageProps {
   code: string | null;
   isStreaming: boolean;
   onFinish: () => void;
+  challenge: Challenge | null;
 }
 
-export function CanvasPage({ code, isStreaming, onFinish }: CanvasPageProps) {
+export function CanvasPage({ code, isStreaming, onFinish, challenge }: CanvasPageProps) {
   const { t } = useTranslation();
 
   return (
@@ -19,6 +22,9 @@ export function CanvasPage({ code, isStreaming, onFinish }: CanvasPageProps) {
           isStreaming={isStreaming}
         />
       </div>
+
+      {/* Floating Review Panel */}
+      <ReviewPanel criteria={challenge?.criteria ?? []} isStreaming={isStreaming} />
 
       {/* Floating Back Button */}
       <button

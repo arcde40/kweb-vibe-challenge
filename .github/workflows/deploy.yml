@@ -1,0 +1,27 @@
+name: Build & Push
+
+on:
+  push:
+    branches: [main]
+
+env:
+  # Cluster-internal registry address — resolvable by DinD pod via CoreDNS.
+  # Kubelet still pulls using 192.168.0.202:5000 (same registry, same content).
+  REGISTRY: registry.registry.svc.cluster.local:5000
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend
+        run: docker build -t $REGISTRY/vibe-backend:latest ./backend
+
+      - name: Build frontend
+        run: docker build -t $REGISTRY/vibe-frontend:latest ./frontend
+
+      - name: Push images
+        run: |
+          docker push $REGISTRY/vibe-backend:latest
+          docker push $REGISTRY/vibe-frontend:latest
