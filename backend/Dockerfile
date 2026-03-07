@@ -1,12 +1,11 @@
-FROM eclipse-temurin:22-jdk-alpine AS build
+FROM gradle:9.3-jdk22-alpine AS build
 WORKDIR /app
 COPY gradle/ gradle/
 COPY gradlew gradlew.bat gradle.properties settings.gradle.kts build.gradle.kts ./
-RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
-RUN ./gradlew dependencies --no-daemon > /dev/null 2>&1 || true
+RUN gradle dependencies --no-daemon > /dev/null 2>&1 || true
 COPY src/ src/
 COPY config/ config/
-RUN ./gradlew buildFatJar --no-daemon && mv build/libs/*-all.jar build/libs/app.jar
+RUN gradle buildFatJar --no-daemon && mv build/libs/*-all.jar build/libs/app.jar
 
 FROM eclipse-temurin:22-jre-alpine
 WORKDIR /app
