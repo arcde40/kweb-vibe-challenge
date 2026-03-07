@@ -13,13 +13,15 @@ class RankingRepository {
         challengeId: Int,
         ticketId: String,
         username: String,
-        letterCount: Int,
+        prompt: String,
     ): RankingSubmitResponse =
         suspendTransaction {
+            val letterCount = prompt.count { it.isLetter() }
             RankingTable.insert {
                 it[challenge] = challengeId
                 it[this.ticketId] = ticketId
                 it[this.username] = username
+                it[this.prompt] = prompt
                 it[this.letterCount] = letterCount
                 it[createdAt] = System.currentTimeMillis()
             }
@@ -41,6 +43,7 @@ class RankingRepository {
                     rank = index + 1,
                     ticketId = row[RankingTable.ticketId],
                     username = row[RankingTable.username],
+                    prompt = row[RankingTable.prompt],
                     letterCount = row[RankingTable.letterCount],
                     createdAt = row[RankingTable.createdAt],
                 )

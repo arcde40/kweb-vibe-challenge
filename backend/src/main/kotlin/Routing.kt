@@ -10,10 +10,12 @@ import org.kweb.api.trial.trialRoutes
 
 fun Application.configureRouting() {
     routing {
-        challengeRoutes()
-        aiRoutes()
-        rankingRoutes()
-        trialRoutes()
+        route("/api") {
+            challengeRoutes()
+            aiRoutes()
+            rankingRoutes()
+            trialRoutes()
+        }
         staticResources("/static", "static")
     }
 }

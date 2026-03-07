@@ -15,7 +15,10 @@ interface CanvasPageProps {
 export function CanvasPage({ code, isStreaming, challenge, ticketId, onFinish, onReviewComplete }: CanvasPageProps) {
   const { t } = useTranslation();
   const criteria = challenge?.criteria ?? [];
-  const showReview = !isStreaming && criteria.length > 0;
+
+  // Only show review after streaming has fully completed AND code exists
+  const streamingDone = !isStreaming && !!code;
+  const showReview = streamingDone && criteria.length > 0;
 
   return (
     <div className="w-full h-screen relative bg-black/90 animate-in zoom-in-95 duration-700">
@@ -31,8 +34,11 @@ export function CanvasPage({ code, isStreaming, challenge, ticketId, onFinish, o
 
       {/* Ticket badge */}
       {ticketId && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white/30 text-xs font-mono tracking-widest">
-          {ticketId.slice(0, 8).toUpperCase()}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 shadow-lg">
+          <span className="text-white/40 text-xs">Ticket</span>
+          <span className="text-white font-mono text-xs font-bold tracking-widest">
+            {ticketId.slice(0, 8).toUpperCase()}
+          </span>
         </div>
       )}
 

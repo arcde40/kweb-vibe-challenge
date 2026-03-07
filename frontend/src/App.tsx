@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { fetchChallenge, createTrial, submitRanking, fetchRanking, API_BASE_URL } from "./api";
 import type { Challenge, Criteria, RankingEntry, RankingSubmitResponse } from "./api";
+
 import { StartPage } from "./pages/StartPage";
 import { InputPage } from "./pages/InputPage";
 import { CanvasPage } from "./pages/CanvasPage";
@@ -8,8 +9,6 @@ import { NameInputPage } from "./pages/NameInputPage";
 import { ResultPage } from "./pages/ResultPage";
 
 type Step = "start" | "input" | "canvas" | "name-input" | "result";
-
-const countLetters = (code: string) => (code.match(/[a-zA-Z]/g) ?? []).length;
 
 function App() {
   const [step, setStep] = useState<Step>("start");
@@ -114,10 +113,9 @@ function App() {
   };
 
   const handleNameSubmit = async (username: string) => {
-    if (constraints && generatedCode && ticketId) {
-      const letterCount = countLetters(generatedCode);
+    if (constraints && ticketId) {
       try {
-        const result = await submitRanking(constraints.id, ticketId, username, letterCount);
+        const result = await submitRanking(constraints.id, ticketId, username, prompt);
         setRankingResponse(result);
         setLeaderboard(result.entries);
       } catch (e) {
@@ -166,7 +164,7 @@ function App() {
             passed={resultPassed}
             failed={resultFailed}
             prompt={prompt}
-            letterCount={generatedCode ? countLetters(generatedCode) : 0}
+            letterCount={rankingResponse?.letterCount ?? [...prompt].filter(c => /\p{L}/u.test(c)).length}
             ticketId={ticketId}
             myRank={rankingResponse?.rank ?? null}
             leaderboard={leaderboard}

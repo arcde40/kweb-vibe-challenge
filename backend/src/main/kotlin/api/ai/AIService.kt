@@ -80,7 +80,7 @@ class AIService(
             "parts": [{ "text": "Output ONLY a raw HTML file with embedded CSS and JS. No markdown, no explanation. Do NOT use any external resources(images, video etc)." }]
           },
           "contents": [{ "parts": [{ "text": "${prompt.replace("\"", "\\\"")}" }] }],
-          "generationConfig": { "maxOutputTokens": 65536, "temperature": 1.8 }
+          "generationConfig": { "maxOutputTokens": 8192, "temperature": 1.0 }
         }
         """.trimIndent()
 

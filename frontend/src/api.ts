@@ -19,7 +19,7 @@ export interface Challenge {
     criteria: Criteria[];
 }
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
+const BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080") + "/api";
 
 export const fetchChallenge = async (): Promise<Challenge> => {
     try {
@@ -51,6 +51,7 @@ export interface RankingEntry {
     rank: number;
     ticketId: string;
     username: string;
+    prompt: string;
     letterCount: number;
     createdAt: number;
 }
@@ -70,11 +71,11 @@ export const createTrial = async (challengeId: number): Promise<{ ticketId: stri
     return response.json();
 };
 
-export const submitRanking = async (challengeId: number, ticketId: string, username: string, letterCount: number): Promise<RankingSubmitResponse> => {
+export const submitRanking = async (challengeId: number, ticketId: string, username: string, prompt: string): Promise<RankingSubmitResponse> => {
     const response = await fetch(`${BASE_URL}/ranking`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ challengeId, ticketId, username, letterCount }),
+        body: JSON.stringify({ challengeId, ticketId, username, prompt }),
     });
     return response.json();
 };
