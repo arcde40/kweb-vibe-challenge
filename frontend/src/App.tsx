@@ -43,6 +43,8 @@ function App() {
     setGeneratedCode("");
     setStreamError(false);
 
+    let completed = false;
+
     const eventSource = new EventSource(
       `${API_BASE_URL}/ai/stream?prompt=${encodeURIComponent(p)}`,
     );
@@ -52,6 +54,7 @@ function App() {
       setIsStreaming(true);
 
       if (event.data === "[DONE]") {
+        completed = true;
         setIsStreaming(false);
         eventSource.close();
         return;
@@ -63,6 +66,7 @@ function App() {
           setGeneratedCode((prev) => (prev || "") + data.chunk);
         }
         if (data.isDone === true) {
+          completed = true;
           setIsStreaming(false);
           eventSource.close();
         }
@@ -78,7 +82,7 @@ function App() {
       eventSource.close();
       setIsLoading(false);
       setIsStreaming(false);
-      setStreamError(true);
+      if (!completed) setStreamError(true);
     };
   };
 
