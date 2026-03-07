@@ -1,4 +1,4 @@
-FROM gradle:9.3-jdk22-alpine AS build
+FROM gradle:9.4-jdk25-alpine AS build
 WORKDIR /app
 COPY gradle/ gradle/
 COPY gradlew gradlew.bat gradle.properties settings.gradle.kts build.gradle.kts ./
@@ -7,7 +7,7 @@ COPY src/ src/
 COPY config/ config/
 RUN gradle buildFatJar --no-daemon && mv build/libs/*-all.jar build/libs/app.jar
 
-FROM eclipse-temurin:22-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
 COPY --from=build /app/build/libs/app.jar app.jar
 EXPOSE 8080
