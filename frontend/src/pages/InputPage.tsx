@@ -28,7 +28,7 @@ export function InputPage({ constraints, onSubmit, isLoading }: InputPageProps) 
       <div className="w-full max-w-4xl space-y-8">
         {/* Challenge Objective Card */}
         {constraints && (
-          <div className="bg-slate-900/80 backdrop-blur-xl border-2 border-indigo-500/30 rounded-3xl p-8 shadow-2xl relative overflow-hidden flex flex-col md:flex-row gap-8 items-center">
+          <div className="bg-card/90 dark:bg-slate-900/80 backdrop-blur-xl border-2 border-indigo-500/30 rounded-3xl p-8 shadow-2xl relative overflow-hidden flex flex-col md:flex-row gap-8 items-center">
             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
 
             <div className="relative z-10 flex-1">
@@ -38,10 +38,10 @@ export function InputPage({ constraints, onSubmit, isLoading }: InputPageProps) 
                   {t("challenge.target_objective")}
                 </h3>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
                 {constraints.title}
               </h2>
-              <div className="prose prose-invert prose-sm md:prose-base mt-2 text-white/80 leading-relaxed">
+              <div className="prose prose-invert dark:prose-invert prose-sm md:prose-base mt-2 text-foreground/80 leading-relaxed">
                 <Markdown>{constraints.description}</Markdown>
               </div>
             </div>

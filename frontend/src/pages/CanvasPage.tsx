@@ -8,16 +8,18 @@ interface CanvasPageProps {
   isStreaming: boolean;
   challenge: Challenge | null;
   ticketId: string | null;
+  streamError: boolean;
   onFinish: () => void;
+  onRetryStream: () => void;
   onReviewComplete: (passed: boolean, failed: Criteria[]) => void;
 }
 
-export function CanvasPage({ code, isStreaming, challenge, ticketId, onFinish, onReviewComplete }: CanvasPageProps) {
+export function CanvasPage({ code, isStreaming, challenge, ticketId, streamError, onFinish, onRetryStream, onReviewComplete }: CanvasPageProps) {
   const { t } = useTranslation();
   const criteria = challenge?.criteria ?? [];
 
   // Only show review after streaming has fully completed AND code exists
-  const streamingDone = !isStreaming && !!code;
+  const streamingDone = !isStreaming && !!code && !streamError;
   const showReview = streamingDone && criteria.length > 0;
 
   return (
@@ -26,6 +28,29 @@ export function CanvasPage({ code, isStreaming, challenge, ticketId, onFinish, o
       <div className="w-full h-full overflow-hidden">
         <SandboxCanvas code={code} isStreaming={isStreaming} />
       </div>
+
+      {/* Stream error overlay */}
+      {streamError && (
+        <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-black/80 border border-white/10 rounded-2xl px-8 py-6 flex flex-col items-center gap-4 shadow-2xl">
+            <p className="text-white/70 text-sm">{t("canvas.stream_error")}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={onRetryStream}
+                className="px-6 py-2 rounded-full bg-blue-600 text-white text-sm font-bold hover:bg-blue-500 transition-all"
+              >
+                {t("canvas.retry")}
+              </button>
+              <button
+                onClick={onFinish}
+                className="px-6 py-2 rounded-full bg-white/10 text-white/60 text-sm font-bold hover:bg-white/20 transition-all"
+              >
+                {t("app.action.finish")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Review overlay — top-center, after streaming */}
       {showReview && (
@@ -42,8 +67,8 @@ export function CanvasPage({ code, isStreaming, challenge, ticketId, onFinish, o
         </div>
       )}
 
-      {/* Floating Back Button — hidden while review is shown */}
-      {!showReview && (
+      {/* Floating Back Button — hidden while review or error is shown */}
+      {!showReview && !streamError && (
         <button
           onClick={onFinish}
           className="absolute top-6 right-6 z-50 text-sm font-bold px-6 py-3 rounded-full bg-black/40 text-white/50 hover:bg-black/80 hover:text-white backdrop-blur-md border border-white/5 hover:border-white/20 transition-all shadow-xl"

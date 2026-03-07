@@ -16,7 +16,7 @@ export function ResultPage({ passed, failed, prompt, letterCount, ticketId, myRa
   const { t } = useTranslation();
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-start pt-12 px-6 bg-black/90 animate-in fade-in duration-500 overflow-y-auto">
+    <div className="w-full h-screen flex flex-col items-center justify-start pt-12 px-6 animate-in fade-in duration-500 overflow-y-auto">
       <div className="w-full max-w-md flex flex-col items-center gap-6 pb-12">
 
         {/* Result header */}

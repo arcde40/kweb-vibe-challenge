@@ -22,6 +22,7 @@ function App() {
   const [resultFailed, setResultFailed] = useState<Criteria[]>([]);
   const [rankingResponse, setRankingResponse] = useState<RankingSubmitResponse | null>(null);
   const [leaderboard, setLeaderboard] = useState<RankingEntry[]>([]);
+  const [streamError, setStreamError] = useState(false);
 
   const handlePickChallenge = async () => {
     setIsLoading(true);
@@ -36,20 +37,11 @@ function App() {
     }
   };
 
-  const handlePromptSubmit = async (p: string) => {
-    setPrompt(p);
-    setStep("canvas");
-    if (constraints) {
-      try {
-        const trial = await createTrial(constraints.id);
-        setTicketId(trial.ticketId);
-      } catch (e) {
-        console.error("Failed to create trial", e);
-      }
-    }
+  const startStream = (p: string) => {
     setIsLoading(true);
     setIsStreaming(false);
     setGeneratedCode("");
+    setStreamError(false);
 
     const eventSource = new EventSource(
       `${API_BASE_URL}/ai/stream?prompt=${encodeURIComponent(p)}`,
@@ -86,7 +78,26 @@ function App() {
       eventSource.close();
       setIsLoading(false);
       setIsStreaming(false);
+      setStreamError(true);
     };
+  };
+
+  const handlePromptSubmit = async (p: string) => {
+    setPrompt(p);
+    setStep("canvas");
+    if (constraints) {
+      try {
+        const trial = await createTrial(constraints.id);
+        setTicketId(trial.ticketId);
+      } catch (e) {
+        console.error("Failed to create trial", e);
+      }
+    }
+    startStream(p);
+  };
+
+  const handleRetryStream = () => {
+    startStream(prompt);
   };
 
   const handleReviewComplete = async (passed: boolean, failed: Criteria[]) => {
@@ -152,7 +163,9 @@ function App() {
             isStreaming={isStreaming}
             challenge={constraints}
             ticketId={ticketId}
+            streamError={streamError}
             onFinish={handleRetry}
+            onRetryStream={handleRetryStream}
             onReviewComplete={handleReviewComplete}
           />
         )}

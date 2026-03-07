@@ -32,9 +32,9 @@ const ConstraintBadge = ({
     <div
       className={`
         flex items-center gap-2 py-1 transition-all duration-300
-        ${isPass ? "text-zinc-500 line-through opacity-70" : ""}
+        ${isPass ? "text-muted-foreground line-through opacity-70" : ""}
         ${isFail ? "text-red-400 animate-pulse font-semibold" : ""}
-        ${isIdle ? "text-zinc-400" : ""}
+        ${isIdle ? "text-muted-foreground" : ""}
       `}
     >
       {isFail && <AlertTriangle className="w-4 h-4 shrink-0" />}
@@ -116,7 +116,7 @@ export function PromptInput({
         <div className="absolute -inset-[3px] bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400 rounded-2xl blur-md opacity-60 group-hover:opacity-100 transition duration-500"></div>
 
         {/* Stronger glassmorphic effect with a slight tint to distinguish from the deep blue background */}
-        <div className="relative flex flex-col bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(59,130,246,0.3)] overflow-hidden focus-within:ring-2 focus-within:ring-white/20">
+        <div className="relative flex flex-col bg-card/80 dark:bg-slate-900/60 backdrop-blur-2xl border border-border dark:border-white/10 rounded-2xl shadow-[0_0_50px_rgba(59,130,246,0.3)] overflow-hidden focus-within:ring-2 focus-within:ring-white/20">
           <div className="flex items-center justify-between px-5 pt-4 pb-2">
             <div className="flex items-center gap-2 text-cyan-400">
               <Wand2 className="h-5 w-5" />
@@ -130,7 +130,7 @@ export function PromptInput({
               <div
                 className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-md backdrop-blur-sm shadow-sm transition-colors border ${
                   isLengthValid
-                    ? "bg-slate-800/80 text-zinc-400 border-white/10"
+                    ? "bg-muted/80 dark:bg-slate-800/80 text-muted-foreground border-border dark:border-white/10"
                     : "bg-red-500/20 text-red-400 border-red-500/50 animate-pulse"
                 }`}
               >
@@ -143,7 +143,7 @@ export function PromptInput({
 
           {/* Inline Constraints Checklist */}
           {constraints && (
-            <div className="px-5 pb-3 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 bg-black/10 mx-3 rounded-lg py-2 mt-1 mb-2 border border-white/5">
+            <div className="px-5 pb-3 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 bg-muted/30 dark:bg-black/10 mx-3 rounded-lg py-2 mt-1 mb-2 border border-border/50 dark:border-white/5">
               {(() => {
                 const status =
                   prompt.length === 0 ? "idle" : isKoreanOnly ? "pass" : "fail";
@@ -204,16 +204,16 @@ export function PromptInput({
               onChange={(e) => setPrompt(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={t("prompt.placeholder")}
-              className="w-full resize-none border-0 focus-visible:ring-0 px-5 py-3 pr-20 text-lg bg-transparent min-h-[120px] max-h-[300px] text-zinc-100 placeholder:text-zinc-500"
+              className="w-full resize-none border-0 focus-visible:ring-0 px-5 py-3 pr-20 text-lg bg-transparent min-h-[120px] max-h-[300px] text-foreground placeholder:text-muted-foreground"
               disabled={isLoading}
             />
           </div>
 
-          <div className="px-5 py-4 bg-black/40 border-t border-white/5 flex justify-between items-center">
+          <div className="px-5 py-4 bg-muted/30 dark:bg-black/40 border-t border-border/50 dark:border-white/5 flex justify-between items-center">
             <div className="flex items-center gap-4">
-              <span className="text-sm text-zinc-400 flex items-center gap-2">
+              <span className="text-sm text-muted-foreground flex items-center gap-2">
                 {t("prompt.press")}{" "}
-                <kbd className="font-mono bg-white/10 px-2 py-1 rounded-md border border-white/10 shadow-sm text-zinc-300">
+                <kbd className="font-mono bg-muted dark:bg-white/10 px-2 py-1 rounded-md border border-border dark:border-white/10 shadow-sm text-foreground dark:text-zinc-300">
                   Enter
                 </kbd>{" "}
                 {t("prompt.to_generate")}
