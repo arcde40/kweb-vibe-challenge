@@ -9,6 +9,8 @@ import org.kweb.api.challenge.ChallengeTable
 import org.kweb.api.constraint.ConstraintTable
 import org.kweb.api.criteria.ChallengeCriteriaTable
 import org.kweb.api.criteria.CriteriaTable
+import org.kweb.api.ranking.RankingTable
+import org.kweb.api.trial.TrialTable
 import java.sql.DriverManager
 
 fun Application.configureDatabases() {
@@ -30,7 +32,7 @@ fun Application.connectToMaria(embedded: Boolean) {
         Database.connect(url, driver = DB_DRIVER_NAME, user = user, password = password)
 
         transaction {
-            SchemaUtils.create(ConstraintTable, ChallengeTable, AIResultTable, CriteriaTable, ChallengeCriteriaTable)
+            SchemaUtils.create(ConstraintTable, ChallengeTable, AIResultTable, CriteriaTable, ChallengeCriteriaTable, TrialTable, RankingTable)
         }
     }
 }

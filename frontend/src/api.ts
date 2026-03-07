@@ -47,4 +47,41 @@ export const fetchChallenge = async (): Promise<Challenge> => {
     }
 };
 
+export interface RankingEntry {
+    rank: number;
+    ticketId: string;
+    username: string;
+    letterCount: number;
+    createdAt: number;
+}
+
+export interface RankingSubmitResponse {
+    rank: number;
+    letterCount: number;
+    entries: RankingEntry[];
+}
+
+export const createTrial = async (challengeId: number): Promise<{ ticketId: string }> => {
+    const response = await fetch(`${BASE_URL}/trial`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ challengeId }),
+    });
+    return response.json();
+};
+
+export const submitRanking = async (challengeId: number, ticketId: string, username: string, letterCount: number): Promise<RankingSubmitResponse> => {
+    const response = await fetch(`${BASE_URL}/ranking`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ challengeId, ticketId, username, letterCount }),
+    });
+    return response.json();
+};
+
+export const fetchRanking = async (challengeId: number): Promise<RankingEntry[]> => {
+    const response = await fetch(`${BASE_URL}/ranking/${challengeId}`);
+    return response.json();
+};
+
 export const API_BASE_URL = BASE_URL;

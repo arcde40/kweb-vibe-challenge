@@ -1,16 +1,28 @@
 import { useState } from "react";
-import { fetchChallenge, API_BASE_URL } from "./api";
-import type { Challenge } from "./api";
+import { fetchChallenge, createTrial, submitRanking, fetchRanking, API_BASE_URL } from "./api";
+import type { Challenge, Criteria, RankingEntry, RankingSubmitResponse } from "./api";
 import { StartPage } from "./pages/StartPage";
 import { InputPage } from "./pages/InputPage";
 import { CanvasPage } from "./pages/CanvasPage";
+import { NameInputPage } from "./pages/NameInputPage";
+import { ResultPage } from "./pages/ResultPage";
+
+type Step = "start" | "input" | "canvas" | "name-input" | "result";
+
+const countLetters = (code: string) => (code.match(/[a-zA-Z]/g) ?? []).length;
 
 function App() {
-  const [step, setStep] = useState<"start" | "input" | "canvas">("start");
+  const [step, setStep] = useState<Step>("start");
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [generatedCode, setGeneratedCode] = useState<string | null>(null);
   const [constraints, setConstraints] = useState<Challenge | null>(null);
+  const [prompt, setPrompt] = useState<string>("");
+  const [ticketId, setTicketId] = useState<string | null>(null);
+  const [resultPassed, setResultPassed] = useState(false);
+  const [resultFailed, setResultFailed] = useState<Criteria[]>([]);
+  const [rankingResponse, setRankingResponse] = useState<RankingSubmitResponse | null>(null);
+  const [leaderboard, setLeaderboard] = useState<RankingEntry[]>([]);
 
   const handlePickChallenge = async () => {
     setIsLoading(true);
@@ -25,14 +37,23 @@ function App() {
     }
   };
 
-  const handlePromptSubmit = (prompt: string) => {
+  const handlePromptSubmit = async (p: string) => {
+    setPrompt(p);
     setStep("canvas");
+    if (constraints) {
+      try {
+        const trial = await createTrial(constraints.id);
+        setTicketId(trial.ticketId);
+      } catch (e) {
+        console.error("Failed to create trial", e);
+      }
+    }
     setIsLoading(true);
     setIsStreaming(false);
-    setGeneratedCode(""); // Reset code for new generation
+    setGeneratedCode("");
 
     const eventSource = new EventSource(
-      `${API_BASE_URL}/ai/stream?prompt=${encodeURIComponent(prompt)}`,
+      `${API_BASE_URL}/ai/stream?prompt=${encodeURIComponent(p)}`,
     );
 
     eventSource.onmessage = (event) => {
@@ -55,7 +76,6 @@ function App() {
           eventSource.close();
         }
       } catch {
-        // Fallback for raw text string streams instead of JSON
         if (typeof event.data === "string") {
           setGeneratedCode((prev) => (prev || "") + event.data);
         }
@@ -68,6 +88,53 @@ function App() {
       setIsLoading(false);
       setIsStreaming(false);
     };
+  };
+
+  const handleReviewComplete = async (passed: boolean, failed: Criteria[]) => {
+    setResultPassed(passed);
+    setResultFailed(failed);
+    setRankingResponse(null);
+    setLeaderboard([]);
+
+    if (!passed) {
+      // Fetch leaderboard for reference, skip name input
+      if (constraints) {
+        try {
+          const entries = await fetchRanking(constraints.id);
+          setLeaderboard(entries);
+        } catch (e) {
+          console.error("Failed to fetch ranking", e);
+        }
+      }
+      setStep("result");
+    } else {
+      // Ask for name before submitting
+      setStep("name-input");
+    }
+  };
+
+  const handleNameSubmit = async (username: string) => {
+    if (constraints && generatedCode && ticketId) {
+      const letterCount = countLetters(generatedCode);
+      try {
+        const result = await submitRanking(constraints.id, ticketId, username, letterCount);
+        setRankingResponse(result);
+        setLeaderboard(result.entries);
+      } catch (e) {
+        console.error("Failed to submit ranking", e);
+      }
+    }
+    setStep("result");
+  };
+
+  const handleRetry = () => {
+    setStep("start");
+    setGeneratedCode(null);
+    setConstraints(null);
+    setPrompt("");
+    setTicketId(null);
+    setRankingResponse(null);
+    setLeaderboard([]);
   };
 
   return (
@@ -85,8 +152,25 @@ function App() {
           <CanvasPage
             code={generatedCode}
             isStreaming={isStreaming}
-            onFinish={() => setStep("start")}
             challenge={constraints}
+            ticketId={ticketId}
+            onFinish={handleRetry}
+            onReviewComplete={handleReviewComplete}
+          />
+        )}
+        {step === "name-input" && (
+          <NameInputPage onSubmit={handleNameSubmit} />
+        )}
+        {step === "result" && (
+          <ResultPage
+            passed={resultPassed}
+            failed={resultFailed}
+            prompt={prompt}
+            letterCount={generatedCode ? countLetters(generatedCode) : 0}
+            ticketId={ticketId}
+            myRank={rankingResponse?.rank ?? null}
+            leaderboard={leaderboard}
+            onRetry={handleRetry}
           />
         )}
       </main>

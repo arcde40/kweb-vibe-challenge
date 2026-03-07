@@ -1,38 +1,50 @@
 import { useTranslation } from "react-i18next";
 import { SandboxCanvas } from "../components/SandboxCanvas";
-import { ReviewPanel } from "../components/ReviewPanel";
-import type { Challenge } from "../api";
+import { ReviewPage } from "./ReviewPage";
+import type { Challenge, Criteria } from "../api";
 
 interface CanvasPageProps {
   code: string | null;
   isStreaming: boolean;
-  onFinish: () => void;
   challenge: Challenge | null;
+  ticketId: string | null;
+  onFinish: () => void;
+  onReviewComplete: (passed: boolean, failed: Criteria[]) => void;
 }
 
-export function CanvasPage({ code, isStreaming, onFinish, challenge }: CanvasPageProps) {
+export function CanvasPage({ code, isStreaming, challenge, ticketId, onFinish, onReviewComplete }: CanvasPageProps) {
   const { t } = useTranslation();
+  const criteria = challenge?.criteria ?? [];
+  const showReview = !isStreaming && criteria.length > 0;
 
   return (
     <div className="w-full h-screen relative bg-black/90 animate-in zoom-in-95 duration-700">
       {/* Full Screen Canvas Area */}
       <div className="w-full h-full overflow-hidden">
-        <SandboxCanvas
-          code={code}
-          isStreaming={isStreaming}
-        />
+        <SandboxCanvas code={code} isStreaming={isStreaming} />
       </div>
 
-      {/* Floating Review Panel */}
-      <ReviewPanel criteria={challenge?.criteria ?? []} isStreaming={isStreaming} />
+      {/* Review overlay — top-center, after streaming */}
+      {showReview && (
+        <ReviewPage criteria={criteria} onComplete={onReviewComplete} />
+      )}
 
-      {/* Floating Back Button */}
-      <button
-        onClick={onFinish}
-        className="absolute top-6 right-6 z-50 text-sm font-bold px-6 py-3 rounded-full bg-black/40 text-white/50 hover:bg-black/80 hover:text-white backdrop-blur-md border border-white/5 hover:border-white/20 transition-all shadow-xl"
-      >
-        {t("app.action.finish")}
-      </button>
+      {/* Ticket badge */}
+      {ticketId && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white/30 text-xs font-mono tracking-widest">
+          {ticketId.slice(0, 8).toUpperCase()}
+        </div>
+      )}
+
+      {/* Floating Back Button — hidden while review is shown */}
+      {!showReview && (
+        <button
+          onClick={onFinish}
+          className="absolute top-6 right-6 z-50 text-sm font-bold px-6 py-3 rounded-full bg-black/40 text-white/50 hover:bg-black/80 hover:text-white backdrop-blur-md border border-white/5 hover:border-white/20 transition-all shadow-xl"
+        >
+          {t("app.action.finish")}
+        </button>
+      )}
     </div>
   );
 }

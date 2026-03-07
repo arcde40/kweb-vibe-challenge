@@ -5,8 +5,6 @@ on:
     branches: [main]
 
 env:
-  # Cluster-internal registry address — resolvable by DinD pod via CoreDNS.
-  # Kubelet still pulls using 192.168.0.202:5000 (same registry, same content).
   REGISTRY: registry.registry.svc.cluster.local:5000
 
 jobs:
@@ -15,13 +13,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build backend
-        run: docker build -t $REGISTRY/vibe-backend:latest ./backend
-
-      - name: Build frontend
-        run: docker build -t $REGISTRY/vibe-frontend:latest ./frontend
+      - name: Build images
+        run: |
+          docker build -t $REGISTRY/vibe-backend:$GITHUB_SHA -t $REGISTRY/vibe-backend:latest ./backend
+          docker build -t $REGISTRY/vibe-frontend:$GITHUB_SHA -t $REGISTRY/vibe-frontend:latest ./frontend
 
       - name: Push images
         run: |
+          docker push $REGISTRY/vibe-backend:$GITHUB_SHA
           docker push $REGISTRY/vibe-backend:latest
+          docker push $REGISTRY/vibe-frontend:$GITHUB_SHA
           docker push $REGISTRY/vibe-frontend:latest
+
+      - name: Update manifests in argocd-repo
+        run: |
+          git clone git@github.com:arcde40/argocd-repo.git /tmp/argocd-repo
+          sed -i "s|192.168.0.202:5000/vibe-backend.*|192.168.0.202:5000/vibe-backend:$GITHUB_SHA|" /tmp/argocd-repo/apps/vibe/01-vibe.yaml
+          sed -i "s|192.168.0.202:5000/vibe-frontend.*|192.168.0.202:5000/vibe-frontend:$GITHUB_SHA|" /tmp/argocd-repo/apps/vibe/01-vibe.yaml
+          cd /tmp/argocd-repo
+          git config user.email "ci@github-actions"
+          git config user.name "GitHub Actions"
+          git add apps/vibe/01-vibe.yaml
+          git commit -m "chore: deploy $GITHUB_SHA"
+          git push
