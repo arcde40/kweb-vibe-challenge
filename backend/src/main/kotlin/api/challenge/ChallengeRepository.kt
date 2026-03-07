@@ -3,6 +3,7 @@ package org.kweb.api.challenge
 import org.jetbrains.exposed.v1.core.Random
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 import org.kweb.api.challenge.model.ChallengeDto
@@ -16,11 +17,12 @@ import org.kweb.api.criteria.toCriteriaDto
 class ChallengeRepository {
     suspend fun findRandom(): ChallengeDto? =
         suspendTransaction {
-            val row = (ChallengeTable innerJoin ConstraintTable)
-                .selectAll()
-                .orderBy(Random())
-                .limit(1)
-                .singleOrNull() ?: return@suspendTransaction null
+            val row =
+                (ChallengeTable innerJoin ConstraintTable)
+                    .selectAll()
+                    .orderBy(Random())
+                    .limit(1)
+                    .singleOrNull() ?: return@suspendTransaction null
 
             val challengeId = row[ChallengeTable.id].value
             val criteria = loadCriteria(listOf(challengeId))[challengeId] ?: emptyList()
@@ -29,10 +31,11 @@ class ChallengeRepository {
 
     suspend fun findAll(): List<ChallengeDto> =
         suspendTransaction {
-            val rows = (ChallengeTable innerJoin ConstraintTable)
-                .selectAll()
-                .orderBy(ChallengeTable.id, SortOrder.ASC)
-                .toList()
+            val rows =
+                (ChallengeTable innerJoin ConstraintTable)
+                    .selectAll()
+                    .orderBy(ChallengeTable.id, SortOrder.ASC)
+                    .toList()
 
             val criteriaByChallenge = loadCriteria(rows.map { it[ChallengeTable.id].value })
 
