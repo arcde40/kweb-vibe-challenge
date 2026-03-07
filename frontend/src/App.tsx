@@ -78,6 +78,7 @@ function App() {
         }
       } catch {
         if (typeof event.data === "string") {
+          codeBuffer += event.data;
           setGeneratedCode((prev) => (prev || "") + event.data);
         }
       }

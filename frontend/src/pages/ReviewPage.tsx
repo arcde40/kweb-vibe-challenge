@@ -51,7 +51,7 @@ export function ReviewPage({ criteria, onComplete }: ReviewPageProps) {
             <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden -mt-1">
               <div
                 className="h-full bg-gradient-to-r from-blue-500 to-indigo-400 rounded-full transition-all duration-300"
-                style={{ width: `${((index + 1) / total) * 100}%` }}
+                style={{ width: `${(index / total) * 100}%` }}
               />
             </div>
 
