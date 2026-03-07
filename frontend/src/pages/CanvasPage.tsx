@@ -9,12 +9,13 @@ interface CanvasPageProps {
   challenge: Challenge | null;
   ticketId: string | null;
   streamError: boolean;
+  generationIncomplete: boolean;
   onFinish: () => void;
   onRetryStream: () => void;
   onReviewComplete: (passed: boolean, failed: Criteria[]) => void;
 }
 
-export function CanvasPage({ code, isStreaming, challenge, ticketId, streamError, onFinish, onRetryStream, onReviewComplete }: CanvasPageProps) {
+export function CanvasPage({ code, isStreaming, challenge, ticketId, streamError, generationIncomplete, onFinish, onRetryStream, onReviewComplete }: CanvasPageProps) {
   const { t } = useTranslation();
   const criteria = challenge?.criteria ?? [];
 
@@ -49,6 +50,13 @@ export function CanvasPage({ code, isStreaming, challenge, ticketId, streamError
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Incomplete generation warning */}
+      {generationIncomplete && !isStreaming && !streamError && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/20 border border-yellow-500/40 backdrop-blur-md shadow-lg">
+          <span className="text-yellow-300 text-xs font-semibold">{t("canvas.incomplete")}</span>
         </div>
       )}
 

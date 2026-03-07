@@ -23,6 +23,7 @@ function App() {
   const [rankingResponse, setRankingResponse] = useState<RankingSubmitResponse | null>(null);
   const [leaderboard, setLeaderboard] = useState<RankingEntry[]>([]);
   const [streamError, setStreamError] = useState(false);
+  const [generationIncomplete, setGenerationIncomplete] = useState(false);
 
   const handlePickChallenge = async () => {
     setIsLoading(true);
@@ -42,8 +43,10 @@ function App() {
     setIsStreaming(false);
     setGeneratedCode("");
     setStreamError(false);
+    setGenerationIncomplete(false);
 
     let completed = false;
+    let codeBuffer = "";
 
     const eventSource = new EventSource(
       `${API_BASE_URL}/ai/stream?prompt=${encodeURIComponent(p)}`,
@@ -55,6 +58,7 @@ function App() {
 
       if (event.data === "[DONE]") {
         completed = true;
+        setGenerationIncomplete(!codeBuffer.trimEnd().toLowerCase().includes("</html>"));
         setIsStreaming(false);
         eventSource.close();
         return;
@@ -63,10 +67,12 @@ function App() {
       try {
         const data = JSON.parse(event.data);
         if (data.chunk || data.chunk === "") {
+          codeBuffer += data.chunk;
           setGeneratedCode((prev) => (prev || "") + data.chunk);
         }
         if (data.isDone === true) {
           completed = true;
+          setGenerationIncomplete(!codeBuffer.trimEnd().toLowerCase().includes("</html>"));
           setIsStreaming(false);
           eventSource.close();
         }
@@ -168,6 +174,7 @@ function App() {
             challenge={constraints}
             ticketId={ticketId}
             streamError={streamError}
+            generationIncomplete={generationIncomplete}
             onFinish={handleRetry}
             onRetryStream={handleRetryStream}
             onReviewComplete={handleReviewComplete}

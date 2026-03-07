@@ -27,6 +27,7 @@ fun Route.aiRoutes() {
             send(ServerSentEvent(data = chunk))
             fullResult.append(chunk)
         }
+        send(ServerSentEvent(data = "[DONE]"))
         aiService.saveResult(prompt, fullResult.toString())
     }
 }
