@@ -24,15 +24,3 @@ jobs:
           docker push $REGISTRY/vibe-backend:latest
           docker push $REGISTRY/vibe-frontend:$GITHUB_SHA
           docker push $REGISTRY/vibe-frontend:latest
-
-      - name: Update manifests in argocd-repo
-        run: |
-          git clone git@github.com:arcde40/argocd-repo.git /tmp/argocd-repo
-          sed -i "s|192.168.0.202:5000/vibe-backend.*|192.168.0.202:5000/vibe-backend:$GITHUB_SHA|" /tmp/argocd-repo/apps/vibe/01-vibe.yaml
-          sed -i "s|192.168.0.202:5000/vibe-frontend.*|192.168.0.202:5000/vibe-frontend:$GITHUB_SHA|" /tmp/argocd-repo/apps/vibe/01-vibe.yaml
-          cd /tmp/argocd-repo
-          git config user.email "ci@github-actions"
-          git config user.name "GitHub Actions"
-          git add apps/vibe/01-vibe.yaml
-          git commit -m "chore: deploy $GITHUB_SHA"
-          git push
