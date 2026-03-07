@@ -8,6 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.ktor.ext.inject
+import kotlin.time.Duration.Companion.seconds
 
 fun Route.aiRoutes() {
     val aiService: AIService by inject()
@@ -16,24 +17,16 @@ fun Route.aiRoutes() {
         val prompt = call.request.queryParameters["prompt"] ?: return@sse
         val fullResult = StringBuilder()
 
-        val heartbeatJob = launch {
-            while (true) {
-                send(ServerSentEvent(data = "", event = "heartbeat"))
-                delay(3000)
-            }
-        }
+        heartbeat { period = 3.seconds }
 
         var firstChunk = true
         aiService.streamCompletion(prompt).collect { chunk ->
             if (firstChunk) {
-                heartbeatJob.cancel()
                 firstChunk = false
             }
             send(ServerSentEvent(data = chunk))
             fullResult.append(chunk)
         }
-
-        heartbeatJob.cancelAndJoin()
         aiService.saveResult(prompt, fullResult.toString())
     }
 }
