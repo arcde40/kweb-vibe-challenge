@@ -70,7 +70,7 @@ export function ResultPage({ passed, failed, prompt, letterCount, ticketId, myRa
             </div>
             <ul className="divide-y divide-white/5">
               {leaderboard.map((entry) => {
-                const isMe = passed && myRank === entry.rank;
+                const isMe = passed && ticketId != null && entry.ticketId === ticketId;
                 return (
                   <li
                     key={entry.rank}
