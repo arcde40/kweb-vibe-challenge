@@ -62,6 +62,23 @@ export interface RankingSubmitResponse {
     entries: RankingEntry[];
 }
 
+export interface ScoredRankingEntry {
+    rank: number;
+    ticketId: string;
+    username: string;
+    prompt: string;
+    score: number;
+    letterCount: number;
+    createdAt: number;
+}
+
+export interface ScoredRankingSubmitResponse {
+    rank: number;
+    score: number;
+    letterCount: number;
+    entries: ScoredRankingEntry[];
+}
+
 export const createTrial = async (challengeId: number): Promise<{ ticketId: string }> => {
     const response = await fetch(`${BASE_URL}/trial`, {
         method: "POST",
@@ -82,6 +99,34 @@ export const submitRanking = async (challengeId: number, ticketId: string, usern
 
 export const fetchRanking = async (challengeId: number): Promise<RankingEntry[]> => {
     const response = await fetch(`${BASE_URL}/ranking/${challengeId}`);
+    return response.json();
+};
+
+export const submitScoredRanking = async (challengeId: number, ticketId: string, username: string, prompt: string, score: number): Promise<ScoredRankingSubmitResponse> => {
+    const response = await fetch(`${BASE_URL}/scored-ranking`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ challengeId, ticketId, username, prompt, score }),
+    });
+    return response.json();
+};
+
+export const fetchScoredRanking = async (challengeId: number): Promise<ScoredRankingEntry[]> => {
+    const response = await fetch(`${BASE_URL}/scored-ranking/${challengeId}`);
+    return response.json();
+};
+
+export interface ReviewResult {
+    score: number;
+    overallFeedback: string;
+}
+
+export const reviewCode = async (html: string, challengeId: number): Promise<ReviewResult> => {
+    const response = await fetch(`${BASE_URL}/ai/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html, challengeId }),
+    });
     return response.json();
 };
 

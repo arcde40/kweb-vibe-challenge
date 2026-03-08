@@ -3,6 +3,7 @@ package org.kweb.api.challenge
 import org.jetbrains.exposed.v1.core.Random
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
@@ -26,6 +27,17 @@ class ChallengeRepository {
 
             val challengeId = row[ChallengeTable.id].value
             val criteria = loadCriteria(listOf(challengeId))[challengeId] ?: emptyList()
+            row.toChallengeDto(criteria)
+        }
+
+    suspend fun findById(id: Int): ChallengeDto? =
+        suspendTransaction {
+            val row =
+                (ChallengeTable innerJoin ConstraintTable)
+                    .selectAll()
+                    .where { ChallengeTable.id eq id }
+                    .singleOrNull() ?: return@suspendTransaction null
+            val criteria = loadCriteria(listOf(id))[id] ?: emptyList()
             row.toChallengeDto(criteria)
         }
 

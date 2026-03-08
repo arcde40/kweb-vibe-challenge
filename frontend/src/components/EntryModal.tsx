@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { RankingEntry } from "../api";
+import type { ScoredRankingEntry } from "../api";
 
 const CSP_META = `<meta http-equiv="Content-Security-Policy" content="default-src 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none';">`;
 
@@ -12,7 +12,7 @@ function injectCSP(code: string): string {
 }
 
 interface EntryModalProps {
-  entry: RankingEntry;
+  entry: ScoredRankingEntry;
   onClose: () => void;
   fetchCode: (ticketId: string) => Promise<string | null>;
 }
@@ -46,6 +46,7 @@ export function EntryModal({ entry, onClose, fetchCode }: EntryModalProps) {
             <span className="text-yellow-400 font-bold text-sm">#{entry.rank}</span>
             <span className="text-white font-semibold text-sm">{entry.username}</span>
             <span className="text-white/30 font-mono text-xs">{entry.ticketId.slice(0, 8).toUpperCase()}</span>
+            <span className="text-xs font-bold text-white/70">{entry.score}/100</span>
             <span className="text-white/50 text-xs">{entry.letterCount} {t("result.letter_count")}</span>
           </div>
           <button

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { fetchChallenge, createTrial, submitRanking, fetchRanking, fetchCodeByTicketId, API_BASE_URL } from "./api";
-import type { Challenge, Criteria, RankingEntry, RankingSubmitResponse } from "./api";
+import { fetchChallenge, createTrial, submitScoredRanking, fetchCodeByTicketId, reviewCode, API_BASE_URL } from "./api";
+import type { Challenge, ScoredRankingEntry, ScoredRankingSubmitResponse } from "./api";
 
 import { StartPage } from "./pages/StartPage";
 import { InputPage } from "./pages/InputPage";
@@ -18,12 +18,13 @@ function App() {
   const [constraints, setConstraints] = useState<Challenge | null>(null);
   const [prompt, setPrompt] = useState<string>("");
   const [ticketId, setTicketId] = useState<string | null>(null);
-  const [resultPassed, setResultPassed] = useState(false);
-  const [resultFailed, setResultFailed] = useState<Criteria[]>([]);
-  const [rankingResponse, setRankingResponse] = useState<RankingSubmitResponse | null>(null);
-  const [leaderboard, setLeaderboard] = useState<RankingEntry[]>([]);
+  const [rankingResponse, setRankingResponse] = useState<ScoredRankingSubmitResponse | null>(null);
+  const [leaderboard, setLeaderboard] = useState<ScoredRankingEntry[]>([]);
   const [streamError, setStreamError] = useState(false);
   const [generationIncomplete, setGenerationIncomplete] = useState(false);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [resultScore, setResultScore] = useState<number | null>(null);
+  const [overallFeedback, setOverallFeedback] = useState<string | null>(null);
 
   const handlePickChallenge = async () => {
     setIsLoading(true);
@@ -114,40 +115,38 @@ function App() {
     startStream(prompt);
   };
 
-  const handleReviewComplete = async (passed: boolean, failed: Criteria[]) => {
-    setResultPassed(passed);
-    setResultFailed(failed);
+  const handleReviewComplete = (score: number | null = null) => {
+    setResultScore(score);
     setRankingResponse(null);
     setLeaderboard([]);
+    setStep("result");
+  };
 
-    if (!passed) {
-      // Fetch leaderboard for reference, skip name input
-      if (constraints) {
-        try {
-          const entries = await fetchRanking(constraints.id);
-          setLeaderboard(entries);
-        } catch (e) {
-          console.error("Failed to fetch ranking", e);
-        }
-      }
-      setStep("result");
-    } else {
-      // Ask for name before submitting
-      setStep("name-input");
+  const triggerAIReview = async (code: string) => {
+    setIsReviewing(true);
+    try {
+      const result = await reviewCode(code, constraints!.id);
+      setOverallFeedback(result.overallFeedback);
+      handleReviewComplete(result.score);
+    } catch (e) {
+      console.error("AI review failed", e);
+      setOverallFeedback(null);
+      handleReviewComplete(null);
+    } finally {
+      setIsReviewing(false);
     }
   };
 
   const handleNameSubmit = async (username: string) => {
     if (constraints && ticketId) {
       try {
-        const result = await submitRanking(constraints.id, ticketId, username, prompt);
+        const result = await submitScoredRanking(constraints.id, ticketId, username, prompt, resultScore ?? 0);
         setRankingResponse(result);
         setLeaderboard(result.entries);
       } catch (e) {
         console.error("Failed to submit ranking", e);
       }
     }
-    setStep("result");
   };
 
   const handleRetry = () => {
@@ -158,6 +157,8 @@ function App() {
     setTicketId(null);
     setRankingResponse(null);
     setLeaderboard([]);
+    setResultScore(null);
+    setOverallFeedback(null);
   };
 
   return (
@@ -175,27 +176,25 @@ function App() {
           <CanvasPage
             code={generatedCode}
             isStreaming={isStreaming}
-            challenge={constraints}
+            isReviewing={isReviewing}
             ticketId={ticketId}
             streamError={streamError}
             generationIncomplete={generationIncomplete}
             onFinish={handleRetry}
             onRetryStream={handleRetryStream}
-            onReviewComplete={handleReviewComplete}
+            onRequestReview={constraints?.criteria?.length ? () => triggerAIReview(generatedCode!) : undefined}
           />
-        )}
-        {step === "name-input" && (
-          <NameInputPage onSubmit={handleNameSubmit} />
         )}
         {step === "result" && (
           <ResultPage
-            passed={resultPassed}
-            failed={resultFailed}
             prompt={prompt}
             letterCount={rankingResponse?.letterCount ?? [...prompt].filter(c => /\p{L}/u.test(c)).length}
             ticketId={ticketId}
             myRank={rankingResponse?.rank ?? null}
             leaderboard={leaderboard}
+            score={resultScore}
+            overallFeedback={overallFeedback}
+            onSubmitName={handleNameSubmit}
             onRetry={handleRetry}
             fetchCode={fetchCodeByTicketId}
           />

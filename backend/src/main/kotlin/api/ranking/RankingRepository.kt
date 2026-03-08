@@ -7,6 +7,8 @@ import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 import org.kweb.api.ranking.model.RankingEntryDto
 import org.kweb.api.ranking.model.RankingSubmitResponse
+import org.kweb.api.ranking.model.ScoredRankingEntryDto
+import org.kweb.api.ranking.model.ScoredRankingSubmitResponse
 
 class RankingRepository {
     suspend fun submit(
@@ -32,6 +34,50 @@ class RankingRepository {
         }
 
     suspend fun findByChallengeId(challengeId: Int): List<RankingEntryDto> = suspendTransaction { entries(challengeId) }
+
+    suspend fun submitScored(
+        challengeId: Int,
+        ticketId: String,
+        username: String,
+        prompt: String,
+        score: Int,
+    ): ScoredRankingSubmitResponse =
+        suspendTransaction {
+            val letterCount = prompt.count { it.isLetter() }
+            ScoredRankingTable.insert {
+                it[challenge] = challengeId
+                it[ScoredRankingTable.ticketId] = ticketId
+                it[ScoredRankingTable.username] = username
+                it[ScoredRankingTable.prompt] = prompt
+                it[ScoredRankingTable.score] = score
+                it[ScoredRankingTable.letterCount] = letterCount
+                it[createdAt] = System.currentTimeMillis()
+            }
+            val all = scoredEntries(challengeId)
+            val rank = all.count { it.score > score } + 1
+            ScoredRankingSubmitResponse(rank = rank, score = score, letterCount = letterCount, entries = all.take(10))
+        }
+
+    suspend fun findScoredByChallengeId(challengeId: Int): List<ScoredRankingEntryDto> =
+        suspendTransaction { scoredEntries(challengeId) }
+
+    private fun scoredEntries(challengeId: Int): List<ScoredRankingEntryDto> =
+        ScoredRankingTable
+            .selectAll()
+            .where { ScoredRankingTable.challenge eq challengeId }
+            .orderBy(ScoredRankingTable.score, SortOrder.DESC)
+            .orderBy(ScoredRankingTable.letterCount, SortOrder.ASC)
+            .mapIndexed { index, row ->
+                ScoredRankingEntryDto(
+                    rank = index + 1,
+                    ticketId = row[ScoredRankingTable.ticketId],
+                    username = row[ScoredRankingTable.username],
+                    prompt = row[ScoredRankingTable.prompt],
+                    score = row[ScoredRankingTable.score],
+                    letterCount = row[ScoredRankingTable.letterCount],
+                    createdAt = row[ScoredRankingTable.createdAt],
+                )
+            }
 
     private fun entries(challengeId: Int): List<RankingEntryDto> =
         RankingTable

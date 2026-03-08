@@ -9,5 +9,7 @@ class ChallengeService(
         challengeRepository.findRandom()
             ?: throw NotFoundException("Challenge not found")
 
+    suspend fun getChallenge(id: Int) = challengeRepository.findById(id)
+
     suspend fun getChallenges() = challengeRepository.findAll()
 }
