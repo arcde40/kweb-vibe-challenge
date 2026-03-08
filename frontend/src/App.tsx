@@ -5,10 +5,9 @@ import type { Challenge, ScoredRankingEntry, ScoredRankingSubmitResponse } from 
 import { StartPage } from "./pages/StartPage";
 import { InputPage } from "./pages/InputPage";
 import { CanvasPage } from "./pages/CanvasPage";
-import { NameInputPage } from "./pages/NameInputPage";
 import { ResultPage } from "./pages/ResultPage";
 
-type Step = "start" | "input" | "canvas" | "name-input" | "result";
+type Step = "start" | "input" | "canvas" | "result";
 
 function App() {
   const [step, setStep] = useState<Step>("start");
