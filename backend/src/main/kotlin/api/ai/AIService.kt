@@ -38,6 +38,11 @@ Score reference: 0-20 broken, 21-40 basic with clear issues,
 A submission that meets all criteria and works correctly should score at least 60.
 Most submissions fall between 55-80. Be fair but reward working implementations generously.
 
+Review format — write in Korean, structured as:
+1. 잘된 점 (1문장)
+2. 아쉬운 점 (1문장)
+3. 총평 (1문장)
+
 Always write in Korean."""
 
 class AIService(
