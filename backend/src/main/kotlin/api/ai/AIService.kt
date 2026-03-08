@@ -69,9 +69,12 @@ class AIService(
         }
 
     suspend fun saveResult(
+        ticketId: String,
         prompt: String,
         generatedHtml: String,
-    ) = aiRepository.save(prompt, generatedHtml)
+    ) = aiRepository.save(ticketId, prompt, generatedHtml)
+
+    suspend fun getResultByTicketId(ticketId: String): String? = aiRepository.findByTicketId(ticketId)
 
     private fun buildRequestBody(prompt: String) =
         """

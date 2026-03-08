@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fetchChallenge, createTrial, submitRanking, fetchRanking, API_BASE_URL } from "./api";
+import { fetchChallenge, createTrial, submitRanking, fetchRanking, fetchCodeByTicketId, API_BASE_URL } from "./api";
 import type { Challenge, Criteria, RankingEntry, RankingSubmitResponse } from "./api";
 
 import { StartPage } from "./pages/StartPage";
@@ -38,7 +38,7 @@ function App() {
     }
   };
 
-  const startStream = (p: string) => {
+  const startStream = (p: string, tId?: string) => {
     setIsLoading(true);
     setIsStreaming(false);
     setGeneratedCode("");
@@ -48,8 +48,9 @@ function App() {
     let completed = false;
     let codeBuffer = "";
 
+    const resolvedTicketId = tId ?? ticketId;
     const eventSource = new EventSource(
-      `${API_BASE_URL}/ai/stream?prompt=${encodeURIComponent(p)}`,
+      `${API_BASE_URL}/ai/stream?prompt=${encodeURIComponent(p)}${resolvedTicketId ? `&ticketId=${resolvedTicketId}` : ""}`,
     );
 
     eventSource.onmessage = (event) => {
@@ -100,6 +101,8 @@ function App() {
       try {
         const trial = await createTrial(constraints.id);
         setTicketId(trial.ticketId);
+        startStream(p, trial.ticketId);
+        return;
       } catch (e) {
         console.error("Failed to create trial", e);
       }
@@ -194,6 +197,7 @@ function App() {
             myRank={rankingResponse?.rank ?? null}
             leaderboard={leaderboard}
             onRetry={handleRetry}
+            fetchCode={fetchCodeByTicketId}
           />
         )}
       </main>

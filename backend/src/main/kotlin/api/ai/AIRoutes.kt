@@ -1,12 +1,11 @@
 package org.kweb.api.ai
 
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 import io.ktor.server.sse.*
 import io.ktor.sse.*
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import org.koin.ktor.ext.inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -15,6 +14,7 @@ fun Route.aiRoutes() {
 
     sse("/ai/stream") {
         val prompt = call.request.queryParameters["prompt"] ?: return@sse
+        val ticketId = call.request.queryParameters["ticketId"] ?: return@sse
         val fullResult = StringBuilder()
 
         heartbeat { period = 3.seconds }
@@ -28,6 +28,14 @@ fun Route.aiRoutes() {
             fullResult.append(chunk)
         }
         send(ServerSentEvent(data = "[DONE]"))
-        aiService.saveResult(prompt, fullResult.toString())
+        aiService.saveResult(ticketId, prompt, fullResult.toString())
+    }
+
+    get("/ai/code/{ticketId}") {
+        val ticketId = call.parameters["ticketId"]
+            ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing ticketId")
+        val code = aiService.getResultByTicketId(ticketId)
+            ?: return@get call.respond(HttpStatusCode.NotFound, "Code not found")
+        call.respond(HttpStatusCode.OK, mapOf("code" to code))
     }
 }

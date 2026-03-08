@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Criteria, RankingEntry } from "../api";
+import { EntryModal } from "../components/EntryModal";
 
 interface ResultPageProps {
   passed: boolean;
@@ -10,10 +12,12 @@ interface ResultPageProps {
   myRank: number | null;
   leaderboard: RankingEntry[];
   onRetry: () => void;
+  fetchCode: (ticketId: string) => Promise<string | null>;
 }
 
-export function ResultPage({ passed, failed, prompt, letterCount, ticketId, myRank, leaderboard, onRetry }: ResultPageProps) {
+export function ResultPage({ passed, failed, prompt, letterCount, ticketId, myRank, leaderboard, onRetry, fetchCode }: ResultPageProps) {
   const { t } = useTranslation();
+  const [selectedEntry, setSelectedEntry] = useState<RankingEntry | null>(null);
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-start pt-12 px-6 animate-in fade-in duration-500 overflow-y-auto">
@@ -68,7 +72,11 @@ export function ResultPage({ passed, failed, prompt, letterCount, ticketId, myRa
               {leaderboard.map((entry) => {
                 const isMe = passed && myRank === entry.rank;
                 return (
-                  <li key={entry.rank} className={`flex items-center gap-3 px-4 py-3 ${isMe ? "bg-white/10" : ""}`}>
+                  <li
+                    key={entry.rank}
+                    onClick={() => setSelectedEntry(entry)}
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors hover:bg-white/5 active:bg-white/10 ${isMe ? "bg-white/10" : ""}`}
+                  >
                     <span className={`text-sm font-bold w-6 shrink-0 ${entry.rank === 1 ? "text-yellow-400" : "text-white/40"}`}>
                       #{entry.rank}
                     </span>
@@ -96,6 +104,14 @@ export function ResultPage({ passed, failed, prompt, letterCount, ticketId, myRa
           {passed ? t("result.play_again") : t("result.try_again")}
         </button>
       </div>
+
+      {selectedEntry && (
+        <EntryModal
+          entry={selectedEntry}
+          onClose={() => setSelectedEntry(null)}
+          fetchCode={fetchCode}
+        />
+      )}
     </div>
   );
 }

@@ -85,4 +85,11 @@ export const fetchRanking = async (challengeId: number): Promise<RankingEntry[]>
     return response.json();
 };
 
+export const fetchCodeByTicketId = async (ticketId: string): Promise<string | null> => {
+    const response = await fetch(`${BASE_URL}/ai/code/${ticketId}`);
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.code ?? null;
+};
+
 export const API_BASE_URL = BASE_URL;
